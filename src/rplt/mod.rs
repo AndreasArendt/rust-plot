@@ -1,21 +1,33 @@
-use std::os::raw;
-
 use eframe::egui::{self, Visuals};
 use eframe::{App, Error, Frame, NativeOptions};
 use egui::CentralPanel;
-use egui_plot::{Line, Plot, PlotPoints, Points};
+use egui_plot::{Line, MarkerShape, Plot, Points};
+
+#[derive(Clone, Copy)]
+pub enum MarkerStyle {
+    Dot,
+    Cross,
+}
+
+#[derive(Clone)]
+pub enum LineStyle {
+    Line,
+    Marker(MarkerStyle),
+}
 
 #[derive(Clone)]
 pub struct PlotData {
-    x_data: Vec<f64>,
-    y_data: Vec<f64>,
+    x: Vec<f64>,
+    y: Vec<f64>,
+    style: LineStyle,
 }
 
 impl PlotData {
-    pub fn new(x: Vec<f64>, y: Vec<f64>) -> Self {
+    pub fn new(x: Vec<f64>, y: Vec<f64>, style: LineStyle) -> Self {
         PlotData {
-            x_data: x,
-            y_data: y,
+            x: x,
+            y: y,
+            style: style,
         }
     }
 }
@@ -34,16 +46,31 @@ impl Rplot {
         eframe::run_native(
             "Line Plot Example",
             options,
-            Box::new(move |_cc| {
-                // Move ownership into the App
-                Ok(Box::new(app.take().unwrap()))
-            }),
+            Box::new(move |_cc| Ok(Box::new(app.take().unwrap()))),
         )
     }
 
-    pub fn plot(&mut self, x: Vec<f64>, y: Vec<f64>) {
-        let plt_data = PlotData::new(x, y);
-        self.data.push(plt_data);
+    pub fn plot(&mut self, x: Vec<f64>, y: Vec<f64>, style: Option<LineStyle>) {
+        self.data
+            .push(PlotData::new(x, y, style.unwrap_or(LineStyle::Line)));
+    }
+
+    fn create_line(&self, points: Vec<[f64; 2]>) -> Line {
+        Line::new("".to_string(), points)
+            .name("Line")
+            .style(egui_plot::LineStyle::Solid)
+    }
+
+    fn create_dot_line(&self, points: Vec<[f64; 2]>, marker_style: MarkerStyle) -> Points {
+        let style = match marker_style {
+            MarkerStyle::Dot => MarkerShape::Circle,
+            MarkerStyle::Cross => MarkerShape::Cross,
+        };
+
+        Points::new("".to_string(), points)
+            .radius(4.0)
+            .name(format!("Dots"))
+            .shape(style)
     }
 }
 
@@ -61,23 +88,23 @@ impl App for Rplot {
             Plot::new("line_plot").show(ui, |plot_ui| {
                 for pts in self.data.iter() {
                     let raw_points: Vec<[f64; 2]> = pts
-                        .x_data
+                        .x
                         .clone()
                         .into_iter()
-                        .zip(pts.y_data.clone().into_iter())
+                        .zip(pts.y.clone().into_iter())
                         .map(|(x, y)| [x, y])
                         .collect();
 
-                    let line = Line::new("".to_string(), raw_points.clone())
-                        .name("Line")
-                        .style(egui_plot::LineStyle::Solid);
-
-                    let dots = Points::new("".to_string(), raw_points.clone())
-                        .radius(2.0)
-                        .name(format!("Dots"));
-
-                    plot_ui.line(line);
-                    plot_ui.points(dots);
+                    match pts.style {
+                        LineStyle::Line => {
+                            let line = self.create_line(raw_points.clone());
+                            plot_ui.line(line);
+                        }
+                        LineStyle::Marker(marker_style) => {
+                            let dots = self.create_dot_line(raw_points.clone(), marker_style);
+                            plot_ui.points(dots);
+                        }
+                    }
                 }
             });
         });
