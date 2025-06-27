@@ -1,15 +1,43 @@
 use eframe::egui::{self, Visuals};
 use eframe::{App, Error, Frame, NativeOptions};
 use egui::CentralPanel;
-use egui_plot::{Line, MarkerShape, Plot, Points};
+use egui_plot::{Line, Plot};
 
-use super::plotdata::*;
+use super::plotdata::LineStyle;
+
+use super::axis::*;
+
+#[derive(Default)]
+pub struct Layout {
+    pub rows: usize,
+    pub columns: usize,
+}
 
 pub struct Figure {
-    data: Vec<PlotData>,
+    axis: Vec<Axis>,
+    layout: Layout,
 }
 
 impl Figure {
+    pub fn new(layout: Layout) -> Self {
+        let mut axis = Vec::with_capacity(layout.rows * layout.columns);
+
+        for row in 0..layout.rows {
+            for col in 0..layout.columns {
+                axis.push(Axis {
+                    row,
+                    column: col,
+                    data: Vec::new(),
+                });
+            }
+        }
+
+        Self {
+            axis: axis,
+            layout: layout,
+        }
+    }
+
     pub fn show(self) -> Result<(), Error> {
         let options = NativeOptions::default();
 
@@ -23,63 +51,109 @@ impl Figure {
         )
     }
 
-    pub fn plot(&mut self, x: Vec<f64>, y: Vec<f64>, style: Option<LineStyle>) {
-        self.data
-            .push(PlotData::new(x, y, style.unwrap_or(LineStyle::Line)));
-    }
-
-    fn create_line(&self, points: Vec<[f64; 2]>) -> Line {
-        Line::new("".to_string(), points)
-            .name("Line")
-            .style(egui_plot::LineStyle::Solid)
-    }
-
-    fn create_dot_line(&self, points: Vec<[f64; 2]>, marker_style: MarkerStyle) -> Points {
-        let style = match marker_style {
-            MarkerStyle::Dot => MarkerShape::Circle,
-            MarkerStyle::Cross => MarkerShape::Cross,
-        };
-
-        Points::new("".to_string(), points)
-            .radius(4.0)
-            .name(format!("Dots"))
-            .shape(style)
+    pub fn subplot(&mut self, row: usize, col: usize) -> Option<&mut Axis> {
+        self.axis
+            .iter_mut()
+            .find(|axis| axis.row == row && axis.column == col)
     }
 }
 
 impl Default for Figure {
     fn default() -> Self {
-        Self { data: Vec::new() }
+        Self {
+            axis: Vec::new(),
+            layout: Layout {
+                rows: 1,
+                columns: 1,
+            },
+        }
     }
 }
 
 impl App for Figure {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
-        ctx.set_visuals(Visuals::light());
+        ctx.set_visuals(Visuals::dark());
 
         CentralPanel::default().show(ctx, |ui| {
-            Plot::new("line_plot").show(ui, |plot_ui| {
-                for pts in self.data.iter() {
-                    let raw_points: Vec<[f64; 2]> = pts
-                        .x
-                        .clone()
-                        .into_iter()
-                        .zip(pts.y.clone().into_iter())
-                        .map(|(x, y)| [x, y])
-                        .collect();
+            ui.heading("2x2 Plot Grid");
 
-                    match pts.style {
-                        LineStyle::Line => {
-                            let line = self.create_line(raw_points.clone());
-                            plot_ui.line(line);
-                        }
-                        LineStyle::Marker(marker_style) => {
-                            let dots = self.create_dot_line(raw_points.clone(), marker_style);
-                            plot_ui.points(dots);
-                        }
+            let available = ui.available_size();
+            let plot_size = egui::Vec2::new(available.x / 2.0, available.y / 2.0);
+
+            for row in 0..self.layout.rows {
+                ui.horizontal(|ui| {
+                    for col in 0..self.layout.columns {
+                        let plot_id = format!("plot_{}_{}", row, col);
+
+                        // Reserve space first
+                        ui.allocate_ui_with_layout(
+                            plot_size,
+                            egui::Layout::top_down(egui::Align::Min),
+                            |ui| {
+                                ui.heading("text");
+
+                                Plot::new(plot_id).show(ui, |plot_ui| {
+                                    let current_axis = self.subplot(row, col).unwrap();
+                                    for pts in current_axis.data.iter() {
+                                        let raw_points: Vec<[f64; 2]> = pts
+                                            .x
+                                            .clone()
+                                            .into_iter()
+                                            .zip(pts.y.clone().into_iter())
+                                            .map(|(x, y)| [x, y])
+                                            .collect();
+
+                                        match pts.style {
+                                            LineStyle::Line => {
+                                                let line =
+                                                    current_axis.create_line(raw_points.clone());
+                                                plot_ui.line(line);
+                                            }
+                                            LineStyle::Marker(marker_style) => {
+                                                let dots = current_axis.create_dot_line(
+                                                    raw_points.clone(),
+                                                    marker_style,
+                                                );
+                                                plot_ui.points(dots);
+                                            }
+                                        }
+                                    }
+                                });
+
+                                // Plot::new(plot_id).show(ui, |plot_ui| {
+                                //     let data = vec![[0.0, row as f64], [1.0, col as f64]];
+                                //     plot_ui.line(Line::new(format!("Line {row},{col}"), data));
+                                // });
+                            },
+                        );
                     }
-                }
-            });
+                });
+            }
         });
+
+        // CentralPanel::default().show(ctx, |ui| {
+        //     Plot::new("line_plot").show(ui, |plot_ui| {
+        //         for pts in self.data.iter() {
+        //             let raw_points: Vec<[f64; 2]> = pts
+        //                 .x
+        //                 .clone()
+        //                 .into_iter()
+        //                 .zip(pts.y.clone().into_iter())
+        //                 .map(|(x, y)| [x, y])
+        //                 .collect();
+
+        //             match pts.style {
+        //                 LineStyle::Line => {
+        //                     let line = self.create_line(raw_points.clone());
+        //                     plot_ui.line(line);
+        //                 }
+        //                 LineStyle::Marker(marker_style) => {
+        //                     let dots = self.create_dot_line(raw_points.clone(), marker_style);
+        //                     plot_ui.points(dots);
+        //                 }
+        //             }
+        //         }
+        //     });
+        // });
     }
 }
