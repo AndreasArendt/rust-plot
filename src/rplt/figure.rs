@@ -119,41 +119,11 @@ impl App for Figure {
                                         }
                                     }
                                 });
-
-                                // Plot::new(plot_id).show(ui, |plot_ui| {
-                                //     let data = vec![[0.0, row as f64], [1.0, col as f64]];
-                                //     plot_ui.line(Line::new(format!("Line {row},{col}"), data));
-                                // });
                             },
                         );
                     }
                 });
             }
         });
-
-        // CentralPanel::default().show(ctx, |ui| {
-        //     Plot::new("line_plot").show(ui, |plot_ui| {
-        //         for pts in self.data.iter() {
-        //             let raw_points: Vec<[f64; 2]> = pts
-        //                 .x
-        //                 .clone()
-        //                 .into_iter()
-        //                 .zip(pts.y.clone().into_iter())
-        //                 .map(|(x, y)| [x, y])
-        //                 .collect();
-
-        //             match pts.style {
-        //                 LineStyle::Line => {
-        //                     let line = self.create_line(raw_points.clone());
-        //                     plot_ui.line(line);
-        //                 }
-        //                 LineStyle::Marker(marker_style) => {
-        //                     let dots = self.create_dot_line(raw_points.clone(), marker_style);
-        //                     plot_ui.points(dots);
-        //                 }
-        //             }
-        //         }
-        //     });
-        // });
     }
 }
