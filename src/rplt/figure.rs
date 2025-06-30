@@ -85,7 +85,10 @@ impl App for Figure {
             ui.heading("2x2 Plot Grid");
 
             let available = ui.available_size();
-            let plot_size = egui::Vec2::new(available.x / 2.0, available.y / 2.0);
+            let plot_size = egui::Vec2::new(
+                available.x / self.layout.columns as f32,
+                available.y / self.layout.rows as f32,
+            );
 
             for row in 0..self.layout.rows {
                 ui.horizontal(|ui| {
