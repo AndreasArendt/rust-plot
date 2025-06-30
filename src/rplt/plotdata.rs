@@ -1,14 +1,4 @@
-#[derive(Clone, Copy)]
-pub enum MarkerStyle {
-    Dot,
-    Cross,
-}
-
-#[derive(Clone)]
-pub enum LineStyle {
-    Line,
-    Marker(MarkerStyle),
-}
+use super::figure::*;
 
 #[derive(Clone)]
 pub struct PlotData {

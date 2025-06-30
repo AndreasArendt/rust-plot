@@ -1,7 +1,6 @@
 pub mod rplt;
 
 use rplt::figure::*;
-use rplt::plotdata::*;
 
 fn main() {
     let x: Vec<f64> = (0..100).map(f64::from).collect();

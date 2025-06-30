@@ -1,9 +1,19 @@
 use eframe::egui::{self, Visuals};
 use eframe::{App, Error, Frame, NativeOptions};
 use egui::CentralPanel;
-use egui_plot::{Line, Plot};
+use egui_plot::Plot;
 
-use super::plotdata::LineStyle;
+#[derive(Clone, Copy)]
+pub enum MarkerStyle {
+    Dot,
+    Cross,
+}
+
+#[derive(Clone)]
+pub enum LineStyle {
+    Line,
+    Marker(MarkerStyle),
+}
 
 use super::axis::*;
 
@@ -24,11 +34,7 @@ impl Figure {
 
         for row in 0..layout.rows {
             for col in 0..layout.columns {
-                axis.push(Axis {
-                    row,
-                    column: col,
-                    data: Vec::new(),
-                });
+                axis.push(Axis::new(row, col));
             }
         }
 
@@ -54,7 +60,8 @@ impl Figure {
     pub fn subplot(&mut self, row: usize, col: usize) -> &mut Axis {
         self.axis
             .iter_mut()
-            .find(|axis| axis.row == row && axis.column == col).unwrap()
+            .find(|axis| axis.row == row && axis.column == col)
+            .unwrap()
     }
 }
 
@@ -93,7 +100,7 @@ impl App for Figure {
                                 ui.heading("text");
 
                                 Plot::new(plot_id).show(ui, |plot_ui| {
-                                    let current_axis = self.subplot(row, col).unwrap();
+                                    let current_axis = self.subplot(row, col);
                                     for pts in current_axis.data.iter() {
                                         let raw_points: Vec<[f64; 2]> = pts
                                             .x

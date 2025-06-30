@@ -1,6 +1,7 @@
 use egui_plot::{Line, MarkerShape, Points};
 
 use super::plotdata::*;
+use super::figure::*;
 
 #[derive(Default)]
 pub struct Axis {
@@ -10,7 +11,7 @@ pub struct Axis {
 }
 
 impl Axis {
-    fn new(row: usize, column: usize) -> Self {
+    pub fn new(row: usize, column: usize) -> Self {
         Self {
             data: Vec::new(),
             row: row,
