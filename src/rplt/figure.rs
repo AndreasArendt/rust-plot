@@ -51,10 +51,10 @@ impl Figure {
         )
     }
 
-    pub fn subplot(&mut self, row: usize, col: usize) -> Option<&mut Axis> {
+    pub fn subplot(&mut self, row: usize, col: usize) -> &mut Axis {
         self.axis
             .iter_mut()
-            .find(|axis| axis.row == row && axis.column == col)
+            .find(|axis| axis.row == row && axis.column == col).unwrap()
     }
 }
 

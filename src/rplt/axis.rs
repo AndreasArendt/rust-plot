@@ -18,9 +18,9 @@ impl Axis {
         }
     }
 
-    pub fn plot(&mut self, x: Vec<f64>, y: Vec<f64>, style: Option<LineStyle>) {
+    pub fn plot(&mut self, x: &Vec<f64>, y: &Vec<f64>, style: Option<LineStyle>) {
         self.data
-            .push(PlotData::new(x, y, style.unwrap_or(LineStyle::Line)));
+            .push(PlotData::new(x.clone(), y.clone(), style.unwrap_or(LineStyle::Line)));
     }
 
     pub fn create_line(&self, points: Vec<[f64; 2]>) -> Line {
