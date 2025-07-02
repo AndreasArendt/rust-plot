@@ -1,6 +1,5 @@
 use egui_plot::{Line, MarkerShape, Points};
 
-use super::plotdata::*;
 use super::figure::*;
 
 #[derive(Default)]
@@ -51,18 +50,12 @@ pub struct PlotData {
 }
 
 impl PlotData {
-    pub fn new() -> Self {
+    pub fn new(x: Vec<f64>, y: Vec<f64>, style: LineStyle) -> Self {
         PlotData {
-            x: Vec::new(),
-            y: Vec::new(),
-            style: LineStyle::Line,            
+            x: x,
+            y: y,
+            style: style,
         }
-    }
-
-    pub fn append(&mut self, x: f64, y: f64) {
-        self.x.push(x.clone());
-        self.y.push(y.clone());
-        self.style = LineStyle::Marker(MarkerStyle::Cross);
     }
 }
 
