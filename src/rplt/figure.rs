@@ -15,6 +15,12 @@ pub enum LineStyle {
     Marker(MarkerStyle),
 }
 
+impl Default for LineStyle {
+    fn default() -> Self {
+        LineStyle::Line
+    }
+}
+
 use super::axis::*;
 
 #[derive(Default)]

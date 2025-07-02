@@ -42,3 +42,32 @@ impl Axis {
             .shape(style)
     }
 }
+
+#[derive(Clone)]
+pub struct PlotData {    
+    pub x: Vec<f64>,
+    pub y: Vec<f64>,
+    pub style: LineStyle,
+}
+
+impl PlotData {
+    pub fn new() -> Self {
+        PlotData {
+            x: Vec::new(),
+            y: Vec::new(),
+            style: LineStyle::Line,            
+        }
+    }
+
+    pub fn append(&mut self, x: f64, y: f64) {
+        self.x.push(x.clone());
+        self.y.push(y.clone());
+        self.style = LineStyle::Marker(MarkerStyle::Cross);
+    }
+}
+
+impl Default for PlotData {
+    fn default() -> Self {
+        Self { x: Default::default(), y: Default::default(), style: Default::default() }
+    }
+}
