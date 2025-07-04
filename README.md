@@ -63,6 +63,9 @@ Available Line Styles (to be extended)
 * Interactive plots (custom linking, limiting, etc.)
 * Custom color and style themes
 
+## Known Issues
+* The GUI only works in blocking mode so that it cannot be updated continuously
+
 ## 🤝 Contributing
 
 Contributions, bug reports, and feature suggestions are welcome! Please open an issue or submit a pull request.
