@@ -2,6 +2,7 @@ use eframe::egui::{self, Visuals};
 use eframe::{App, Error, Frame, NativeOptions};
 use egui::CentralPanel;
 use egui_plot::Plot;
+use super::Axis;
 
 #[derive(Clone, Copy)]
 pub enum MarkerStyle {
@@ -20,8 +21,6 @@ impl Default for LineStyle {
         LineStyle::Line
     }
 }
-
-use super::axis::*;
 
 #[derive(Default)]
 pub struct Layout {

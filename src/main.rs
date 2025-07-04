@@ -1,4 +1,4 @@
-use rust_plot::{create_figure, rplt::figure::{Layout, LineStyle, MarkerStyle}};
+use rplt::{create_figure, figure::{Layout, LineStyle, MarkerStyle}};
 
 fn main() {
     let x: Vec<f64> = (0..100).map(f64::from).collect();
