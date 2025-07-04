@@ -3,6 +3,9 @@ name = "rust-plot"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+path = "src/lib.rs"
+
 [dependencies]
 eframe = "0.31.1"
 egui_plot = "0.32.1"
