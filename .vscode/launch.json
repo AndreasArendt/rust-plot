@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run plot_gui",
+      "type": "lldb", // or "cppdbg" if using C++ debugger
+      "request": "launch",
+      "cargo": {
+        "args": ["run", "--package", "plot_gui"]
+      },
+      "program": "${cargo:program}",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false
+    }
+  ]
+}

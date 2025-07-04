@@ -1,0 +1,16 @@
+[package]
+name = "plot_gui"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "plot_gui"
+path = "src/lib.rs"
+
+[[bin]]
+name = "plot_gui"
+path = "src/main.rs"
+
+[dependencies]
+eframe = "0.31.1"
+egui_plot = "0.32.1"
