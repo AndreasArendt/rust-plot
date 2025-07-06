@@ -7,6 +7,7 @@ pub struct Axis {
     pub data: Vec<PlotData>,
     pub row: usize,
     pub column: usize,
+    pub title: String,
 }
 
 impl Axis {
@@ -15,6 +16,7 @@ impl Axis {
             data: Vec::new(),
             row: row,
             column: column,
+            title: "".to_string(),
         }
     }
 

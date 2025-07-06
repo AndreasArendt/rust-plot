@@ -31,6 +31,7 @@ pub struct Layout {
 pub struct Figure {
     axis: Vec<Axis>,
     layout: Layout,
+    pub title : String
 }
 
 impl Figure {
@@ -46,6 +47,7 @@ impl Figure {
         Self {
             axis: axis,
             layout: layout,
+            title: "".to_string(),
         }
     }
 
@@ -81,6 +83,7 @@ impl Default for Figure {
                 rows: 1,
                 columns: 1,
             },
+            title: "".to_string(),
         }
     }
 }
@@ -90,7 +93,9 @@ impl App for Figure {
         ctx.set_visuals(Visuals::dark());
 
         CentralPanel::default().show(ctx, |ui| {
-            ui.heading("2x2 Plot Grid");
+            if !self.title.is_empty(){
+                ui.heading(self.title.clone());
+            }
 
             let available = ui.available_size();
             let plot_size = egui::Vec2::new(
@@ -100,6 +105,7 @@ impl App for Figure {
 
             for row in 0..self.layout.rows {
                 ui.horizontal(|ui| {
+                    
                     for col in 0..self.layout.columns {
                         let plot_id = format!("plot_{}_{}", row, col);
 
@@ -108,10 +114,14 @@ impl App for Figure {
                             plot_size,
                             egui::Layout::top_down(egui::Align::Min),
                             |ui| {
-                                ui.heading("text");
+                                let current_axis = self.subplot(row, col);
+                                
+                                // set title
+                                if !current_axis.title.is_empty() {
+                                    ui.heading(current_axis.title.clone());
+                                }
 
                                 Plot::new(plot_id).show(ui, |plot_ui| {
-                                    let current_axis = self.subplot(row, col);
                                     for pts in current_axis.data.iter() {
                                         let raw_points: Vec<[f64; 2]> = pts
                                             .x
