@@ -1,8 +1,8 @@
+use super::Axis;
 use eframe::egui::{self, Visuals};
 use eframe::{App, Error, Frame, NativeOptions};
 use egui::CentralPanel;
 use egui_plot::Plot;
-use super::Axis;
 
 #[derive(Clone, Copy)]
 pub enum MarkerStyle {
@@ -50,7 +50,10 @@ impl Figure {
     }
 
     pub fn show(self) -> Result<(), Error> {
-        let options = NativeOptions::default();
+        let options: NativeOptions = NativeOptions {
+            centered: true,            
+            ..NativeOptions::default()
+        };
 
         // Wrap `self` in `Some` so we can `take()` it inside the closure
         let mut app = Some(self);
