@@ -29,7 +29,7 @@ pub struct Layout {
 }
 
 pub struct Figure {
-    axis: Vec<Axis>,
+    axis: Vec<Axis<f64>>,
     layout: Layout,
     pub title : String
 }
@@ -67,7 +67,7 @@ impl Figure {
         )
     }
 
-    pub fn subplot(&mut self, row: usize, col: usize) -> &mut Axis {
+    pub fn subplot(&mut self, row: usize, col: usize) -> &mut Axis<f64> {
         self.axis
             .iter_mut()
             .find(|axis| axis.row == row && axis.column == col)
@@ -125,12 +125,12 @@ impl App for Figure {
                                     for pts in current_axis.data.iter() {
                                         let raw_points: Vec<[f64; 2]> = pts
                                             .x
-                                            .clone()
-                                            .into_iter()
-                                            .zip(pts.y.clone().into_iter())
+                                            .iter()
+                                            .cloned()
+                                            .zip(pts.y.iter().cloned())
                                             .map(|(x, y)| [x, y])
                                             .collect();
-
+                                    
                                         match pts.style {
                                             LineStyle::Line => {
                                                 let line =
